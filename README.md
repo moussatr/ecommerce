@@ -691,9 +691,11 @@ sans vérifier au préalable si des données doivent être conservées.
 
 # 🔁 CI/CD
 
-Un workflow initial est disponible dans `.github/workflows/ci.yml`. Il exécute
-la vérification Maven du backend et le build Angular du frontend sur les pushes
-vers `main` et `develop`, ainsi que sur les Pull Requests.
+Un workflow initial est disponible dans `.github/workflows/ci.yml`. Il démarre
+un PostgreSQL de service pour la vérification Maven du backend, puis exécute le
+build Angular du frontend sur les pushes vers `main` et `develop`, ainsi que
+sur les Pull Requests. Les jobs utilisent Ubuntu 24.04 et les versions
+actuelles des actions GitHub.
 
 Pipeline prévu :
 
