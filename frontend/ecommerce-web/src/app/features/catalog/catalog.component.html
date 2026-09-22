@@ -1,0 +1,59 @@
+<section class="catalog" aria-labelledby="catalog-title">
+  <header class="catalog__header">
+    <div>
+      <p class="eyebrow">Catalogue</p>
+      <h2 id="catalog-title">Nos produits</h2>
+    </div>
+    <span class="count">{{ products().length }} produits</span>
+  </header>
+
+  <div class="filters">
+    <label>
+      <span>Rechercher</span>
+      <input type="search" placeholder="Nom du produit" [value]="searchTerm" (input)="onSearch($event)" />
+    </label>
+    <label>
+      <span>Catégorie</span>
+      <select (change)="onCategoryChange($event)">
+        <option value="">Toutes les catégories</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (categories().length) {
+    <nav class="categories" aria-label="Catégories">
+      @for (category of categories(); track category.id) {
+        <span class="category">{{ category.name }}</span>
+      }
+    </nav>
+  }
+
+  @if (loading()) {
+    <p class="message">Chargement du catalogue...</p>
+  } @else if (error()) {
+    <p class="message message--error">{{ error() }}</p>
+  } @else if (!products().length) {
+    <p class="message">Aucun produit disponible pour le moment.</p>
+  } @else {
+    <div class="products">
+      @for (product of products(); track product.id) {
+        <article class="product">
+          <div class="product__topline">
+            <span class="product__category">{{ product.category?.name ?? 'Sans catégorie' }}</span>
+            <span>{{ product.stock }} en stock</span>
+          </div>
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.description || 'Aucune description disponible.' }}</p>
+          <strong>{{ product.price | number: '1.2-2' }} €</strong>
+          <a [routerLink]="['/catalog/products', product.id]">Voir le produit</a>
+          <button type="button" [disabled]="product.stock < 1" (click)="addToCart(product)">
+            {{ product.stock < 1 ? 'Rupture de stock' : 'Ajouter au panier' }}
+          </button>
+        </article>
+      }
+    </div>
+  }
+</section>

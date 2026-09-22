@@ -1,0 +1,154 @@
+.catalog {
+  width: min(100%, 72rem);
+  margin: 0 auto;
+}
+
+.catalog__header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow,
+.count,
+.product__topline,
+.message {
+  color: #697386;
+  font-size: 0.875rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h2 {
+  color: #18212f;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filters label {
+  display: grid;
+  gap: 0.4rem;
+  color: #526071;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.filters input,
+.filters select {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d6dce5;
+  border-radius: 0.35rem;
+  background: #ffffff;
+  color: #18212f;
+  font: inherit;
+}
+
+.category {
+  border: 1px solid #d6dce5;
+  border-radius: 999px;
+  color: #334155;
+  padding: 0.4rem 0.75rem;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1rem;
+}
+
+.product {
+  display: grid;
+  gap: 0.9rem;
+  min-height: 11rem;
+  padding: 1.25rem;
+  border: 1px solid #e1e6ed;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  box-shadow: 0 0.75rem 2rem rgb(24 33 47 / 6%);
+}
+
+.product__topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.product__category {
+  color: #176b87;
+  font-weight: 600;
+}
+
+.product h3 {
+  color: #18212f;
+  font-size: 1.2rem;
+}
+
+.product p {
+  color: #526071;
+  line-height: 1.5;
+}
+
+.product strong {
+  align-self: end;
+  color: #c24f32;
+  font-size: 1.1rem;
+}
+
+.product a {
+  color: #176b87;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.product button {
+  border: 0;
+  border-radius: 0.35rem;
+  padding: 0.65rem 0.8rem;
+  background: #176b87;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product button:disabled {
+  background: #d6dce5;
+  color: #697386;
+  cursor: not-allowed;
+}
+
+.message--error {
+  color: #b42318;
+}
+
+@media (max-width: 600px) {
+  .filters {
+    grid-template-columns: 1fr;
+  }
+}

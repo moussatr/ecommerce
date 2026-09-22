@@ -1,5 +1,14 @@
 <main>
-  <h1>E-commerce</h1>
-  <p>API status: {{ status() }}</p>
+  <header class="app-header">
+    <h1>E-commerce</h1>
+    <p>API status: {{ status() }}</p>
+    <a routerLink="/cart">Panier</a>
+    @if (authService.isAuthenticated()) {
+      <a routerLink="/profile">Profil</a>
+      <button type="button" (click)="authService.logout()">Déconnexion</button>
+    } @else {
+      <a routerLink="/auth">Connexion</a>
+    }
+  </header>
   <router-outlet />
 </main>

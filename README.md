@@ -21,17 +21,17 @@ L'objectif est de construire une application e-commerce moderne, maintenable, s�
 | Architecture du projet | 🟢     |
 | Backend Spring Boot    | 🟢     |
 | Frontend Angular       | 🟢     |
-| PostgreSQL             | 🟡     |
-| Flyway                 | 🟡     |
-| Docker                 | 🟡     |
-| Authentification       | ⚪      |
-| Catalogue produits     | ⚪      |
-| Panier                 | ⚪      |
+| PostgreSQL             | 🟢     |
+| Flyway                 | 🟢     |
+| Docker                 | 🟢     |
+| Authentification       | 🟡     |
+| Catalogue produits     | 🟢     |
+| Panier                 | 🟡     |
 | Commandes              | ⚪      |
 | Paiement Stripe        | ⚪      |
 | Administration         | ⚪      |
-| Tests automatisés      | ⚪      |
-| CI/CD                  | ⚪      |
+| Tests automatisés      | 🟡     |
+| CI/CD                  | 🟡      |
 | Déploiement VPS        | ⚪      |
 | Monitoring             | ⚪      |
 
@@ -95,14 +95,14 @@ L'application doit être conçue pour pouvoir évoluer sans devoir réécrire to
 
 ## Fonctionnels
 
-* [ ] Consultation du catalogue
-* [ ] Recherche de produits
-* [ ] Filtrage et catégories
-* [ ] Fiche produit
-* [ ] Gestion du panier
-* [ ] Création de compte
-* [ ] Connexion / déconnexion
-* [ ] Gestion du profil
+* [x] Consultation du catalogue
+* [x] Recherche de produits
+* [x] Filtrage et catégories initial
+* [x] Fiche produit initiale
+* [x] Gestion du panier initiale
+* [x] Création de compte
+* [x] Connexion / déconnexion
+* [x] Gestion du profil
 * [ ] Passage de commande
 * [ ] Paiement Stripe
 * [ ] Historique des commandes
@@ -117,14 +117,14 @@ L'application doit être conçue pour pouvoir évoluer sans devoir réécrire to
 * [ ] API REST
 * [ ] Validation backend
 * [ ] Gestion centralisée des erreurs
-* [ ] Authentification sécurisée
-* [ ] Gestion des rôles
-* [ ] Migrations Flyway
-* [ ] Tests unitaires
+* [x] Authentification sécurisée initiale
+* [x] Gestion des rôles initiale
+* [x] Migrations Flyway
+* [x] Tests unitaires de base
 * [ ] Tests d'intégration
 * [ ] Tests E2E
-* [ ] Dockerisation
-* [ ] CI/CD
+* [x] Dockerisation initiale
+* [x] CI/CD initiale
 * [ ] HTTPS
 * [ ] Monitoring
 * [ ] Logs structurés
@@ -347,6 +347,15 @@ Health check :
 http://localhost:8080/api/v1/health
 ```
 
+Réponse attendue :
+
+```json
+{
+   "status": "UP",
+   "service": "ecommerce-api"
+}
+```
+
 ---
 
 ## 3. Démarrer Angular
@@ -378,6 +387,11 @@ User: ecommerce
 ```
 
 Le mot de passe est fourni par la configuration d'environnement.
+
+La valeur locale par défaut est `ecommerce_dev`. Si le volume PostgreSQL a été
+initialisé avec un autre mot de passe, il faut synchroniser le mot de passe du
+rôle existant ou recréer le volume uniquement si aucune donnée ne doit être
+conservée.
 
 ## Docker
 
@@ -412,9 +426,12 @@ backend/ecommerce-api/src/main/resources/db/migration/
 Format :
 
 ```text
-V1__init_schema.sql
-V2__add_products.sql
-V3__add_orders.sql
+V1__create_products.sql
+V2__create_categories.sql
+V3__create_user_accounts.sql
+V4__create_carts.sql
+V5__add_profile_fields.sql
+V6__seed_catalog.sql
 ```
 
 ### Règles
@@ -454,7 +471,7 @@ GET    /api/v1/products
 GET    /api/v1/products/{id}
 
 POST   /api/v1/auth/register
-POST   /api/v1/auth/login
+Connexion HTTP Basic sur les endpoints protégés
 
 GET    /api/v1/cart
 POST   /api/v1/cart/items
@@ -462,6 +479,11 @@ POST   /api/v1/cart/items
 POST   /api/v1/orders
 GET    /api/v1/orders
 GET    /api/v1/orders/{id}
+
+GET    /api/v1/cart
+POST   /api/v1/cart/items
+PUT    /api/v1/cart/items/{productId}
+DELETE /api/v1/cart/items/{productId}
 
 POST   /api/v1/payments/checkout
 ```
@@ -489,6 +511,10 @@ Le frontend ne doit jamais être considéré comme une source de vérité pour :
 
 Ces informations doivent être validées côté backend.
 
+En développement, Angular utilise `proxy.conf.json` pour rediriger les appels
+`/api` vers Spring Boot sur `http://localhost:8080`. L'application appelle
+donc l'API via `/api/v1/health`.
+
 ---
 
 # 🧪 Tests
@@ -515,6 +541,12 @@ PostgreSQL
 
 ```bash
 npm test
+```
+
+Build frontend :
+
+```bash
+npm run build
 ```
 
 ## E2E
@@ -559,6 +591,16 @@ Principes obligatoires :
 * protection contre les doubles traitements ;
 * logs sans données sensibles.
 
+L'inscription est disponible via `POST /api/v1/auth/register`. Les nouveaux
+comptes reçoivent le rôle `CUSTOMER` et les mots de passe sont stockés avec
+BCrypt. Les routes `/api/v1/admin/**` nécessitent le rôle `ADMIN`; la
+provision d'un compte administrateur sera ajoutée avec la gestion complète des
+utilisateurs.
+
+Le frontend propose la page `/auth`. Un visiteur peut utiliser un panier local;
+après connexion, les opérations du panier sont synchronisées avec l'API
+persistante.
+
 ---
 
 # 💳 Paiement Stripe
@@ -597,6 +639,10 @@ Le frontend ne doit jamais déterminer lui-même le montant final d'une commande
 
 # 🐳 Docker
 
+Les Dockerfiles backend et frontend sont disponibles dans leurs projets
+respectifs. Le Compose racine peut lancer PostgreSQL, Spring Boot et Angular
+derrière Nginx :
+
 Services prévus :
 
 ```text
@@ -623,6 +669,10 @@ Commandes :
 docker compose up -d
 ```
 
+Le frontend est exposé sur `http://localhost` lorsque le port 80 est disponible.
+Le frontend et le backend peuvent aussi être lancés localement avec les
+commandes de la section [Lancement](#-lancement).
+
 Arrêt :
 
 ```bash
@@ -640,6 +690,10 @@ sans vérifier au préalable si des données doivent être conservées.
 ---
 
 # 🔁 CI/CD
+
+Un workflow initial est disponible dans `.github/workflows/ci.yml`. Il exécute
+la vérification Maven du backend et le build Angular du frontend sur les pushes
+vers `main` et `develop`, ainsi que sur les Pull Requests.
 
 Pipeline prévu :
 
@@ -704,8 +758,14 @@ Les secrets de production ne doivent jamais être stockés dans Git.
 * [x] PostgreSQL Docker
 * [x] Spring Boot
 * [x] Flyway
-* [ ] Corriger configuration PostgreSQL
-* [ ] Uniformiser Java 21
+* [x] Endpoint de santé backend
+* [x] Service de santé frontend
+* [x] Proxy Angular de développement
+* [x] Dockerfiles backend et frontend
+* [x] Compose full-stack initial
+* [x] Workflow CI initial
+* [x] Configurer Java 21 comme cible Maven
+* [ ] Installer Java 21 dans l'environnement local
 
 ## Phase 1 — Architecture backend
 
@@ -719,31 +779,32 @@ Les secrets de production ne doivent jamais être stockés dans Git.
 
 ## Phase 2 — Catalogue
 
-* [ ] Produit
-* [ ] Catégorie
+* [x] Produit
+* [x] Catégorie
 * [ ] Prix
 * [ ] Stock
 * [ ] Images
-* [ ] CRUD administration
-* [ ] API catalogue
-* [ ] Interface catalogue
+* [x] CRUD administration initial des produits et catégories
+* [x] API catalogue de lecture
+* [x] Interface catalogue initiale
 
 ## Phase 3 — Identité
 
-* [ ] Inscription
-* [ ] Connexion
-* [ ] Authentification
-* [ ] Rôles
-* [ ] Client
-* [ ] Administration
+* [x] Inscription
+* [x] Connexion HTTP Basic initiale
+* [x] Authentification persistée
+* [x] Rôles CUSTOMER et ADMIN
+* [x] Profil client initial
+* [x] Protection initiale de l'administration catalogue
 
 ## Phase 4 — Panier
 
-* [ ] Création panier
-* [ ] Ajout produit
-* [ ] Modification quantité
-* [ ] Suppression
-* [ ] Calcul total
+* [x] Création panier frontend
+* [x] Ajout produit
+* [x] Modification quantité
+* [x] Suppression
+* [x] Calcul total
+* [x] Panier persistant côté backend
 * [ ] Validation stock
 
 ## Phase 5 — Commandes
@@ -774,8 +835,8 @@ Les secrets de production ne doivent jamais être stockés dans Git.
 
 ## Phase 8 — Production
 
-* [ ] Docker images
-* [ ] GitHub Actions
+* [x] Docker images
+* [x] GitHub Actions initiales
 * [ ] VPS
 * [ ] Reverse proxy
 * [ ] HTTPS
@@ -790,7 +851,7 @@ Les secrets de production ne doivent jamais être stockés dans Git.
 
 Cette section doit être mise à jour à chaque étape importante.
 
-## 2026-09-21 — Initialisation
+## 2026-09-21 — Initialisation et socle technique
 
 ### Réalisé
 
@@ -800,52 +861,33 @@ Cette section doit être mise à jour à chaque étape importante.
 * PostgreSQL 17 configuré avec Docker.
 * Flyway configuré.
 * Endpoint de santé ajouté.
-* Première tentative de lancement du backend.
+* Service de santé Angular ajouté.
+* Proxy Angular configuré pour le développement local.
+* Dockerfiles backend et frontend ajoutés.
+* Compose full-stack configuré avec PostgreSQL, backend et frontend.
+* Nginx configuré pour servir l'application Angular et proxyfier `/api`.
+* Workflow GitHub Actions initial ajouté.
+* Tests backend et frontend exécutés avec succès.
+* Images Docker backend et frontend construites avec succès.
 
-### Problèmes identifiés
+### Problème résolu
 
 **PostgreSQL**
 
-Spring Boot obtient actuellement :
+Lors de la première initialisation, Spring Boot obtenait :
 
 ```text
 FATAL: password authentication failed for user "ecommerce"
 ```
 
-Cause probable :
+Le mot de passe du rôle `ecommerce` a été synchronisé avec `ecommerce_dev`,
+sans supprimer le volume ni les données existantes.
 
-Le mot de passe configuré dans PostgreSQL ne correspond pas à :
+### Prochaines étapes
 
-```text
-ecommerce_dev
-```
-
-dans `application-dev.yml`.
-
-**Java**
-
-Le projet est actuellement compilé avec :
-
-```text
-release 17
-```
-
-alors que la cible du projet est :
-
-```text
-Java 21 LTS
-```
-
-La JVM utilisée actuellement pour exécuter Spring Boot est Java 25.
-
-### Prochaine étape
-
-1. Vérifier `docker-compose.yml`.
-2. Corriger la configuration PostgreSQL.
-3. Vérifier la connexion Spring Boot → PostgreSQL.
-4. Configurer Maven pour Java 21.
-5. Relancer Flyway.
-6. Vérifier le démarrage complet du backend.
+1. Installer Java 21 dans l'environnement local.
+2. Ajouter la création de commandes à partir du panier.
+3. Ajouter l’historique des commandes côté client.
 
 ---
 

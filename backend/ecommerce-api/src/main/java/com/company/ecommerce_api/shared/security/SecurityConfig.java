@@ -2,8 +2,11 @@ package com.company.ecommerce_api.shared.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -18,10 +21,19 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/health").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
+                .requestMatchers("/api/v1/products", "/api/v1/products/", "/api/v1/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults());
 
         return http.build();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

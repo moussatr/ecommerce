@@ -1,16 +1,18 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 
 import { HealthService } from './core/services/health.service';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterLink, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
   private readonly healthService = inject(HealthService);
+  readonly authService = inject(AuthService);
 
   readonly status = signal('Checking...');
 
