@@ -30,7 +30,10 @@
       <aside class="summary">
         <span>Total</span>
         <strong>{{ cartService.total() | number: '1.2-2' }} €</strong>
-        <button type="button" disabled>Passer la commande</button>
+        @if (orderError) { <p class="error">{{ orderError }}</p> }
+        <button type="button" [disabled]="ordering" (click)="placeOrder()">
+          {{ ordering ? 'Création...' : 'Passer la commande' }}
+        </button>
       </aside>
     </div>
   }

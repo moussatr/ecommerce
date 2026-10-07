@@ -1,0 +1,68 @@
+name: SonarQube Analysis
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/ecommerce-api/pom.xml
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/ecommerce-web/package-lock.json
+
+      - name: Compile backend
+        working-directory: backend/ecommerce-api
+        run: ./mvnw -B -DskipTests package
+
+      - name: Install frontend dependencies
+        working-directory: frontend/ecommerce-web
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend/ecommerce-web
+        run: npm run build
+
+      - name: Check SonarQube secrets
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        run: |
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "::error::Add SONAR_TOKEN in the GitHub repository Actions secrets."
+            exit 1
+          fi
+          if [ -z "$SONAR_HOST_URL" ]; then
+            echo "::error::Add SONAR_HOST_URL in the GitHub repository Actions secrets."
+            exit 1
+          fi
+
+      - name: Analyze with SonarQube
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: -Dsonar.qualitygate.wait=true

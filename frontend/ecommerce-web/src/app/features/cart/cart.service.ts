@@ -103,6 +103,14 @@ export class CartService {
     this.items.set(this.items().filter((item) => item.product.id !== productId));
   }
 
+  refresh(): void {
+    if (this.authService.isAuthenticated()) {
+      this.loadRemoteCart();
+    } else {
+      this.items.set([]);
+    }
+  }
+
   private loadRemoteCart(): void {
     this.http.get<CartResponse>(this.apiUrl, {
       headers: this.authService.getAuthHeaders()

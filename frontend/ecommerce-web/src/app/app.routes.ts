@@ -4,12 +4,14 @@ import { ProductDetailComponent } from './features/catalog/product-detail.compon
 import { CartComponent } from './features/cart/cart.component';
 import { AuthComponent } from './features/auth/auth.component';
 import { ProfileComponent } from './features/profile/profile.component';
+import { OrdersComponent } from './features/order/orders.component';
 
 export const routes: Routes = [
 	{ path: '', pathMatch: 'full', redirectTo: 'catalog' },
 	{ path: 'catalog', component: CatalogComponent },
 	{ path: 'catalog/products/:id', component: ProductDetailComponent },
 	{ path: 'cart', component: CartComponent },
-	{ path: 'auth', component: AuthComponent }
-	, { path: 'profile', component: ProfileComponent }
+	{ path: 'auth', component: AuthComponent },
+	{ path: 'profile', component: ProfileComponent },
+	{ path: 'orders', component: OrdersComponent }
 ];

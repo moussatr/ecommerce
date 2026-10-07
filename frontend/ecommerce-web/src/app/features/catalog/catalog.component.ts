@@ -1,6 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { DecimalPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
 
 import { CatalogService } from './catalog.service';
 import { CartService } from '../cart/cart.service';
@@ -9,7 +7,6 @@ import { Category, Product } from '../../shared/models/product.model';
 @Component({
   selector: 'app-catalog',
   standalone: true,
-  imports: [DecimalPipe, RouterLink],
   templateUrl: './catalog.component.html',
   styleUrl: './catalog.component.scss'
 })

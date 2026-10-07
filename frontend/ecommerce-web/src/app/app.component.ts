@@ -1,25 +1,26 @@
+import { DecimalPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 
-import { HealthService } from './core/services/health.service';
 import { AuthService } from './core/services/auth.service';
+import { CartService } from './features/cart/cart.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterLink, RouterOutlet],
+  imports: [DecimalPipe, RouterLink, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  private readonly healthService = inject(HealthService);
   readonly authService = inject(AuthService);
+  readonly cartService = inject(CartService);
+  readonly cartOpen = signal(false);
 
-  readonly status = signal('Checking...');
+  toggleCart(): void {
+    this.cartOpen.update((isOpen) => !isOpen);
+  }
 
-  constructor() {
-    this.healthService.getHealth().subscribe({
-      next: (response) => this.status.set(response.status),
-      error: () => this.status.set('API unavailable')
-    });
+  closeCart(): void {
+    this.cartOpen.set(false);
   }
 }

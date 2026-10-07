@@ -87,6 +87,13 @@ public class Product {
         this.active = false;
     }
 
+    public void decreaseStock(int quantity) {
+        if (quantity > stock) {
+            throw new IllegalArgumentException("Insufficient stock");
+        }
+        stock -= quantity;
+    }
+
     public Long getId() {
         return id;
     }

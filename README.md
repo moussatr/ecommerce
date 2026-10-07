@@ -103,9 +103,9 @@ L'application doit être conçue pour pouvoir évoluer sans devoir réécrire to
 * [x] Création de compte
 * [x] Connexion / déconnexion
 * [x] Gestion du profil
-* [ ] Passage de commande
+* [x] Passage de commande initial
 * [ ] Paiement Stripe
-* [ ] Historique des commandes
+* [x] Historique des commandes initial
 * [ ] Gestion des stocks
 * [ ] Administration des produits
 * [ ] Administration des commandes
@@ -432,6 +432,7 @@ V3__create_user_accounts.sql
 V4__create_carts.sql
 V5__add_profile_fields.sql
 V6__seed_catalog.sql
+V7__create_orders.sql
 ```
 
 ### Règles
@@ -479,6 +480,9 @@ POST   /api/v1/cart/items
 POST   /api/v1/orders
 GET    /api/v1/orders
 GET    /api/v1/orders/{id}
+
+POST   /api/v1/orders
+GET    /api/v1/orders
 
 GET    /api/v1/cart
 POST   /api/v1/cart/items
@@ -600,6 +604,18 @@ utilisateurs.
 Le frontend propose la page `/auth`. Un visiteur peut utiliser un panier local;
 après connexion, les opérations du panier sont synchronisées avec l'API
 persistante.
+
+Pour activer Stripe Checkout en local, définir les variables suivantes avant de
+lancer le backend :
+
+```bash
+export STRIPE_SECRET_KEY=sk_test_...
+export STRIPE_SUCCESS_URL=http://localhost:4200/orders
+export STRIPE_CANCEL_URL=http://localhost:4200/cart
+```
+
+Sans `STRIPE_SECRET_KEY`, l'endpoint de paiement répond `503` sans exposer de
+secret. La confirmation automatique du paiement par webhook reste à implémenter.
 
 ---
 
@@ -811,16 +827,17 @@ Les secrets de production ne doivent jamais être stockés dans Git.
 
 ## Phase 5 — Commandes
 
-* [ ] Création commande
-* [ ] Statuts
-* [ ] Historique
+* [x] Création commande initiale
+* [x] Statuts
+* [x] Historique
 * [ ] Adresse
 * [ ] Calcul montant
-* [ ] Gestion transactionnelle
+* [x] Gestion transactionnelle initiale
 
 ## Phase 6 — Paiement
 
 * [ ] Stripe Checkout
+* [x] Préparation Stripe Checkout côté backend
 * [ ] Webhook
 * [ ] Vérification signature
 * [ ] Idempotence

@@ -1,14 +1,70 @@
-<main>
-  <header class="app-header">
-    <h1>E-commerce</h1>
-    <p>API status: {{ status() }}</p>
-    <a routerLink="/cart">Panier</a>
-    @if (authService.isAuthenticated()) {
-      <a routerLink="/profile">Profil</a>
-      <button type="button" (click)="authService.logout()">Déconnexion</button>
-    } @else {
-      <a routerLink="/auth">Connexion</a>
-    }
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand-wrap">
+      <a class="brand" routerLink="/catalog">Nova.</a>
+    </div>
+
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a routerLink="/catalog">Catalogue</a>
+      <a routerLink="/catalog">La maison</a>
+    </nav>
+
+    <button type="button" class="cart-button" aria-label="Ouvrir le panier" (click)="toggleCart()">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 5h2l2.2 9.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.75L20 7H7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M9 18.5a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0Zm8 0a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      @if (cartService.itemCount() > 0) {
+        <span class="cart-badge">{{ cartService.itemCount() }}</span>
+      }
+    </button>
   </header>
-  <router-outlet />
-</main>
+
+  <div class="page-surface">
+    <div class="content-area">
+      <router-outlet />
+    </div>
+
+    <aside class="cart-panel" [class.is-open]="cartOpen()" aria-label="Panier">
+      <button type="button" class="close-panel" aria-label="Fermer le panier" (click)="closeCart()">
+        ×
+      </button>
+
+      @if (cartService.cartItems().length) {
+        <div class="cart-panel__content">
+          <h2>Votre panier</h2>
+
+          <div class="cart-items">
+            @for (item of cartService.cartItems(); track item.product.id) {
+              <div class="cart-item">
+                <div class="cart-item__meta">
+                  <span class="cart-item__name">{{ item.product.name }}</span>
+                  <span class="cart-item__qty">{{ item.quantity }} x {{ item.product.price | number: '1.2-2' }} €</span>
+                </div>
+                <strong>{{ (item.product.price * item.quantity) | number: '1.2-2' }} €</strong>
+              </div>
+            }
+          </div>
+
+          <div class="cart-summary">
+            <span>Total</span>
+            <strong>{{ cartService.total() | number: '1.2-2' }} €</strong>
+          </div>
+
+          <a class="cart-link" routerLink="/cart" (click)="closeCart()">Voir le panier</a>
+        </div>
+      } @else {
+        <div class="cart-empty-state">
+          <h2>Votre panier</h2>
+          <p>Votre panier est vide</p>
+          <div class="cart-empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <path d="M16 22h32l-2.5 26.5a4 4 0 0 1-4 3.5H22.5a4 4 0 0 1-4-3.5L16 22Zm10-7.5A7.5 7.5 0 0 1 33.5 7h0A7.5 7.5 0 0 1 41 14.5V22h-10v-7.5Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="cart-empty-copy">Votre panier est vide</p>
+        </div>
+      }
+    </aside>
+  </div>
+</div>
